@@ -1,11 +1,11 @@
 open Token
 
 let is_keyword = function
-  | "break" | "case" | "catch" | "class" | "const" | "continue"
-  | "debugger" | "default" | "delete" | "do" | "else" | "export" | "extends"
-  | "finally" | "for" | "function" | "if" | "import" | "in" | "instanceof"
-  | "new" | "return" | "super" | "switch" | "this" | "throw" | "try"
-  | "typeof" | "var" | "void" | "while" | "with" | "yield" -> true
+  | "def" | "break" | "case" | "catch" | "const" | "continue"
+  | "debugger" | "do" | "else" | "export" | "extends"
+  | "finally" | "for" | "if" | "import" | "in" | "instanceof"
+  | "new" | "return" | "super" | "throw" | "try"
+  | "typeof" | "let" | "end" | "while" | "with" | "yield" -> true
   | _ -> false
 
 let lexeme = Sedlexing.Utf8.lexeme
@@ -214,9 +214,40 @@ let token (env: Lex_env.t) lexbuf : result =
       raw =(Sedlexing.Latin1.lexeme lexbuf);
     })
 
-  | letter, Star ('A'..'Z' | 'a'..'z' | digit) ->
+  | id_start, Star (id_continue) ->
     let content = Sedlexing.Latin1.lexeme lexbuf in
-    Token(env, T_IDENTIFIER { loc = loc_of_lexbuf env lexbuf ; value = content; raw = content})
+    if is_keyword content then
+      match content with
+      | "def" -> Token (env, T_DEF)
+      | "break" -> Token (env, T_BREAK)
+      | "case" -> Token (env, T_CASE)
+      | "catch" -> Token (env, T_CATCH)
+      | "const" -> Token (env, T_CONST)
+      | "continue" -> Token (env, T_CONTINUE)
+      | "debugger" -> Token (env, T_DEBUGGER)
+      | "do" -> Token (env, T_DO)
+      | "else" -> Token (env, T_ELSE)
+      | "export" -> Token (env, T_EXPORT)
+      | "extends" -> Token (env, T_EXTENDS)
+      | "finally" -> Token (env, T_FINALLY)
+      | "for" -> Token (env, T_FOR)
+      | "if" -> Token (env, T_IF)
+      | "import" -> Token (env, T_IMPORT)
+      | "in" -> Token (env, T_IN)
+      | "instanceof" -> Token (env, T_INSTANCEOF)
+      | "new" -> Token (env, T_NEW)
+      | "return" -> Token (env, T_RETURN)
+      | "super" -> Token (env, T_SUPER)
+      | "throw" -> Token (env, T_THROW)
+      | "try" -> Token (env, T_TRY)
+      | "typeof" -> Token (env, T_TYPEOF)
+      | "let" -> Token (env, T_LET)
+      | "end" -> Token (env, T_END)
+      | "while" -> Token (env, T_WHILE)
+      | "with" -> Token (env, T_WITH)
+      | "yield" -> Token (env, T_YIELD)
+    else
+      Token(env, T_IDENTIFIER { loc = loc_of_lexbuf env lexbuf ; value = content; raw = content})
 
   (* Values *)
   | "'" | '"' ->
@@ -229,6 +260,9 @@ let token (env: Lex_env.t) lexbuf : result =
     let env, _end, octal = string_quote env quote buf raw octal lexbuf in
     let loc = Loc.btwn start _end in
     Token (env, T_STRING (loc, Buffer.contents buf, Buffer.contents raw, octal))
+
+  | '(' -> Token (env, T_LPAREN)
+  | ')' -> Token (env, T_RPAREN)
 
   | '=' -> Token (env, T_ASSIGN)
   | ':' -> Token (env, T_COLON)

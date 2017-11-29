@@ -9,6 +9,8 @@ module rec RealParser : PARSER = struct
   include ExpressionParser(RealParser)
 
   let parse env : Program.t =
+    let _ = Parser_env.next_token env in
+
     Ast.Program.([])
 
 end
@@ -27,7 +29,6 @@ let () =
   let env = Parser_env.create lex_env
   in
 
-  let _ = Parser_env.next_token env
-  in
+  let program = RealParser.parse env in
 
   ()

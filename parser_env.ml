@@ -37,8 +37,6 @@ let match_token t tok =
   (* Syntax *)
   | T_LCURLY, T_LCURLY
   | T_RCURLY, T_RCURLY
-  | T_LCURLYBAR, T_LCURLYBAR
-  | T_RCURLYBAR, T_RCURLYBAR
   | T_LPAREN, T_LPAREN
   | T_RPAREN, T_RPAREN
   | T_LBRACKET, T_LBRACKET
@@ -64,9 +62,26 @@ let eat t tok =
     true
   else false
 
-(* TODO: finish  *)
+
+exception ParsingError of string
+
+let throw_error t (content:string) =
+  let env = t.lex_env in
+  let begin_loc = Lex_env.(Lexer.loc_of_lexbuf env env.lex_lb) in
+  let start = begin_loc.start in
+  let messasge = Printf.sprintf "%d:%d: Error: %s"
+    start.line start.column
+    content
+  in
+  raise (ParsingError messasge)
+
 let expect t tok =
-  if match_token t tok then
-  ()
+  if match_token t tok then ()
   else
-    failwith "unexpected token"
+    let this_tok_name = value_of_token tok in
+    let target_tok_name = value_of_token (peek t) in
+    let messasge = Printf.sprintf
+      "Unexpected: %s expected: %s"
+      this_tok_name target_tok_name
+    in
+    throw_error t messasge

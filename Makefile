@@ -11,7 +11,7 @@ loc.cmx: loc.ml
 	ocamlc -c loc.mli;
 	ocamlopt -c loc.ml
 
-token.cmx: token.ml
+token.cmx: loc.cmx token.ml
 	ocamlfind ocamlopt -c -package sedlex token.ml
 
 lex_env.cmx: loc.cmx lex_env.ml
@@ -20,11 +20,11 @@ lex_env.cmx: loc.cmx lex_env.ml
 ast.cmx: ast.ml
 	ocamlfind ocamlopt -c -package sedlex ast.ml
 
-parser_env.cmx: token.cmx lex_env.cmx  \
+parser_env.cmx: token.cmx lex_env.cmx lexer.cmx  \
 	parser_env.mli parser_env.ml
 	ocamlfind ocamlc -c parser_env.mli;
 	ocamlfind ocamlopt -c token.cmx lex_env.cmx \
-	parser_env.ml
+	lexer.cmx parser_env.ml
 
 parser_common.cmx : ast.cmx parser_common.ml
 	ocamlopt -c ast.cmx parser_common.ml
@@ -45,6 +45,9 @@ parser.cmx: parser_env.cmx parser_common.cmx statementParser.cmx \
 	parser_env.cmx parser_common.cmx \
 	statementParser.cmx expressionParser.cmx \
 	parser.ml
+
+astdump.cmx: ast.cmx astdump.ml
+	ocamlopt -c ast.cmx astdump.ml
 
 clean:
 	rm ./*.cmi;

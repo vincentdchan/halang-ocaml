@@ -2,7 +2,9 @@ open Token
 open Lexer
 
 let () =
-  let lexbuf = Sedlexing.Latin1.from_string "foobar \"asdf\" A123Bfoo  ++++123Xbar/foo" in
+  let src = "def name(ok) do print(\"hello\") end"
+  in
+  let lexbuf = Sedlexing.Latin1.from_string src in
   let env = {
     Lex_env.lex_lb                = lexbuf;
     Lex_env.lex_bol               = Lex_env.init_bol;

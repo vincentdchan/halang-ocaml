@@ -7,8 +7,6 @@ type t =
   (* Syntax *)
   | T_LCURLY
   | T_RCURLY
-  | T_LCURLYBAR
-  | T_RCURLYBAR
   | T_LPAREN
   | T_RPAREN
   | T_LBRACKET
@@ -33,7 +31,6 @@ type t =
   | T_THIS
   | T_THROW
   | T_TRY
-  | T_VAR
   | T_WHILE
   | T_WITH
   | T_CONST
@@ -152,7 +149,6 @@ let token_to_string = function
   | T_THIS -> "T_THIS"
   | T_THROW -> "T_THROW"
   | T_TRY -> "T_TRY"
-  | T_VAR -> "T_VAR"
   | T_WHILE -> "T_WHILE"
   | T_WITH -> "T_WITH"
   | T_CONST -> "T_CONST"
@@ -197,8 +193,6 @@ let token_to_string = function
   | T_CHECKS -> "T_CHECKS"
   | T_LCURLY -> "T_LCURLY"
   | T_RCURLY -> "T_RCURLY"
-  | T_LCURLYBAR -> "T_LCURLYBAR"
-  | T_RCURLYBAR -> "T_RCURLYBAR"
   | T_LPAREN -> "T_LPAREN"
   | T_RPAREN -> "T_RPAREN"
   | T_LBRACKET -> "T_LBRACKET"
@@ -252,8 +246,6 @@ let value_of_token = function
   | T_IDENTIFIER { raw; _ } -> raw
   | T_LCURLY -> "{"
   | T_RCURLY -> "}"
-  | T_LCURLYBAR -> "{|"
-  | T_RCURLYBAR -> "|}"
   | T_LPAREN -> "("
   | T_RPAREN -> ")"
   | T_LBRACKET -> "["
@@ -277,7 +269,6 @@ let value_of_token = function
   | T_THIS -> "this"
   | T_THROW -> "throw"
   | T_TRY -> "try"
-  | T_VAR -> "var"
   | T_WHILE -> "while"
   | T_WITH -> "with"
   | T_CONST -> "const"

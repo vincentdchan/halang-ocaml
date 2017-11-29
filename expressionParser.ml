@@ -111,10 +111,10 @@ end = struct
     let next_token () = Parser_env.next_token env in
     let expect = Parser_env.expect env in
     match current_tok with
-    | T_LCURLY ->
+    | T_LPAREN ->
       let _ =next_token () in
       let expr = Parser.parse_expression env in
-      expect T_RCURLY;
+      expect T_LPAREN;
       let _ = next_token () in
       expr
     | T_IDENTIFIER _ ->
@@ -187,7 +187,7 @@ end = struct
       match next_tok with
       | T_ASSIGN ->
           Assign (Parser.parse_assign_expr env (Some id))
-      | T_LCURLY ->
+      | T_LPAREN ->
           Call (Parser.parse_call_expr env (Identifier id))
       | T_LBRACKET ->
           Member (Parser.parse_member_expr env (Identifier id))
