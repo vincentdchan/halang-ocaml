@@ -39,8 +39,8 @@ expressionParser.cmx : ast.cmx token.cmx parser_common.cmx \
 	ocamlopt -c ast.cmx token.cmx parser_common.cmx \
 		expressionParser.ml
 
-parser.cmx: parser_env.cmx statementParser.cmx \
-	expressionParser.ml parser.ml
+parser.cmx: parser_env.cmx parser_common.cmx statementParser.cmx \
+	expressionParser.cmx parser.ml
 	ocamlfind ocamlopt -c -package sedlex \
 	parser_env.cmx parser_common.cmx \
 	statementParser.cmx expressionParser.cmx \

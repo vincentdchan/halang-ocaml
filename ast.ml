@@ -53,7 +53,7 @@ module rec Expression : sig
 
   module Call : sig
     type t = {
-      body: Identifier.t;
+      body: Expression.t;
       params: Expression.t list;
     }
   end
