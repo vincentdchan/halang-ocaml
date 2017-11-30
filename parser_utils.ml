@@ -28,12 +28,11 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
     | 0 -> ""
     | _ -> "  " ^ make_spaces (number - 1)
 
-  let rec dump_stats stats depth =
-    match stats with
-    | [] -> ()
-    | stat::rest ->
+  let dump_stats stats depth =
+    List.iter (fun stat ->
       Dump.dump_statement stat depth;
-      dump_stats rest depth;;
+    ) stats;
+  ;;
 
   let dump_program prog depth =
     Program.(
@@ -181,6 +180,18 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
       | Expression expr ->
         Printf.printf "%sExpressionStatement\n" (make_spaces depth);
         dump_expression expr (depth + 1)
+      | Break ->
+        Printf.printf "%sBreakStatement\n" (make_spaces depth);
+      | Continue ->
+        Printf.printf "%sContinueStatement\n" (make_spaces depth);
+      | Return expr ->
+        Printf.printf "%sReturnStatement\n" (make_spaces depth);
+        (match expr with
+        | None ->
+          Printf.printf "%sNone\n" (make_spaces (depth + 1));
+        | Some expr ->
+          Dump.dump_expression expr (depth + 1);
+        )
     )
 
   let dump_if_stat stat depth =

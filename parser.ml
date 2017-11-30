@@ -2,6 +2,7 @@ open Ast
 open Token
 open Parser_common
 open StatementParser
+open Parser_utils
 open ExpressionParser
 
 module rec RealParser : PARSER = struct
@@ -11,12 +12,23 @@ module rec RealParser : PARSER = struct
   let parse env : Program.t =
     let _ = Parser_env.next_token env in
 
-    Ast.Program.([])
+    let stats = ref [] in
+
+    let rec parse_statements () =
+      if Parser_env.peek env <> T_EOF then
+        let stat = RealParser.parse_statement env in
+        stats := stat::!stats;
+        parse_statements()
+    in
+
+    parse_statements ();
+
+    Ast.Program.(List.rev !stats)
 
 end
 
 let () =
-  let lexbuf = Sedlexing.Latin1.from_string "foobar \"asdf\" A123Bfoo  ++++123Xbar/foo" in
+  let lexbuf = Sedlexing.Latin1.from_string "let a = 323" in
   let lex_env = {
     Lex_env.lex_lb                = lexbuf;
     Lex_env.lex_bol               = Lex_env.init_bol;
@@ -31,4 +43,4 @@ let () =
 
   let program = RealParser.parse env in
 
-  ()
+  AstDump.dump_program program 0

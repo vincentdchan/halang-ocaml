@@ -28,7 +28,6 @@ type t =
   | T_INSTANCEOF
   | T_RETURN
   | T_SWITCH
-  | T_THIS
   | T_THROW
   | T_TRY
   | T_WHILE
@@ -48,13 +47,9 @@ type t =
   | T_FOR
   | T_CLASS
   | T_EXTENDS
-  | T_STATIC
   | T_ELSE
   | T_NEW
-  | T_DELETE
   | T_TYPEOF
-  | T_VOID
-  | T_ENUM
   | T_EXPORT
   | T_IMPORT
   | T_SUPER
@@ -68,7 +63,6 @@ type t =
   | T_DEBUGGER
   | T_DECLARE
   | T_TYPE
-  | T_OPAQUE
   | T_OF
   | T_ASYNC
   | T_AWAIT
@@ -146,7 +140,6 @@ let token_to_string = function
   | T_INSTANCEOF -> "T_INSTANCEOF"
   | T_RETURN -> "T_RETURN"
   | T_SWITCH -> "T_SWITCH"
-  | T_THIS -> "T_THIS"
   | T_THROW -> "T_THROW"
   | T_TRY -> "T_TRY"
   | T_WHILE -> "T_WHILE"
@@ -166,13 +159,9 @@ let token_to_string = function
   | T_FOR -> "T_FOR"
   | T_CLASS -> "T_CLASS"
   | T_EXTENDS -> "T_EXTENDS"
-  | T_STATIC -> "T_STATIC"
   | T_ELSE -> "T_ELSE"
   | T_NEW -> "T_NEW"
-  | T_DELETE -> "T_DELETE"
   | T_TYPEOF -> "T_TYPEOF"
-  | T_VOID -> "T_VOID"
-  | T_ENUM -> "T_ENUM"
   | T_EXPORT  -> "T_EXPORT"
   | T_IMPORT -> "T_IMPORT"
   | T_SUPER  -> "T_SUPER"
@@ -186,7 +175,6 @@ let token_to_string = function
   | T_DEBUGGER -> "T_DEBUGGER"
   | T_DECLARE -> "T_DECLARE"
   | T_TYPE -> "T_TYPE"
-  | T_OPAQUE -> "T_OPAQUE"
   | T_OF -> "T_OF"
   | T_ASYNC -> "T_ASYNC"
   | T_AWAIT -> "T_AWAIT"
@@ -266,7 +254,6 @@ let value_of_token = function
   | T_INSTANCEOF -> "instanceof"
   | T_RETURN -> "return"
   | T_SWITCH -> "switch"
-  | T_THIS -> "this"
   | T_THROW -> "throw"
   | T_TRY -> "try"
   | T_WHILE -> "while"
@@ -286,13 +273,9 @@ let value_of_token = function
   | T_FOR -> "for"
   | T_CLASS -> "class"
   | T_EXTENDS -> "extends"
-  | T_STATIC -> "static"
   | T_ELSE -> "else"
   | T_NEW -> "new"
-  | T_DELETE -> "delete"
   | T_TYPEOF -> "typeof"
-  | T_VOID -> "void"
-  | T_ENUM -> "enum"
   | T_EXPORT -> "export"
   | T_IMPORT -> "import"
   | T_SUPER -> "super"
@@ -306,7 +289,6 @@ let value_of_token = function
   | T_DEBUGGER -> "debugger"
   | T_DECLARE -> "declare"
   | T_TYPE -> "type"
-  | T_OPAQUE -> "opaque"
   | T_OF -> "of"
   | T_ASYNC -> "async"
   | T_AWAIT -> "await"

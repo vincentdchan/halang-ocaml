@@ -17,6 +17,12 @@ end = struct
       | T_IF ->
         let stmt = Parser.parse_ifstatement env in
         (If stmt)
+      | T_WHILE ->
+        let stmt = Parser.parse_whilestatement env in
+        (While stmt)
+      | T_LET ->
+        let stmt = Parser.parse_letstatement env in
+        (Let stmt)
       | _ ->
         let expr = Parser.parse_expression env in
         (Expression expr)

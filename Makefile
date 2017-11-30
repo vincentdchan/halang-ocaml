@@ -34,23 +34,32 @@ statementParser.cmx : ast.cmx token.cmx parser_common.cmx \
 	ocamlopt -c ast.cmx token.cmx parser_common.cmx \
 		statementParser.ml
 
-expressionParser.cmx : ast.cmx token.cmx parser_common.cmx \
-	expressionParser.ml
-	ocamlopt -c ast.cmx token.cmx parser_common.cmx \
-		expressionParser.ml
+parser_utils.cmx: ast.cmx parser_utils.ml
+	ocamlopt -c ast.cmx parser_utils.ml
 
-parser.cmx: parser_env.cmx parser_common.cmx statementParser.cmx \
-	expressionParser.cmx parser.ml
-	ocamlfind ocamlopt -c -package sedlex \
+expressionParser.cmx : ast.cmx token.cmx parser_common.cmx \
+	parser_utils.cmx expressionParser.ml
+	ocamlopt -c ast.cmx token.cmx parser_common.cmx \
+		parser_utils.cmx expressionParser.ml
+
+# parser.cmx: parser_env.cmx parser_common.cmx statementParser.cmx \
+# 	expressionParser.cmx parser.ml
+# 	ocamlfind ocamlopt -c -package sedlex \
+# 	parser_env.cmx parser_common.cmx \
+# 	statementParser.cmx expressionParser.cmx \
+# 	parser.ml
+
+parser: lexer.cmx lex_env.cmx token.cmx \
+	parser_env.cmx parser_common.cmx statementParser.cmx \
+	expressionParser.cmx parser_utils.cmx parser.ml
+	ocamlfind ocamlopt -o parser -linkpkg -package sedlex \
+	loc.cmx token.cmx lex_env.cmx lexer.cmx \
 	parser_env.cmx parser_common.cmx \
 	statementParser.cmx expressionParser.cmx \
-	parser.ml
-
-astdump.cmx: ast.cmx astdump.ml
-	ocamlopt -c ast.cmx astdump.ml
+	parser_utils.cmx parser.ml
 
 clean:
-	rm ./*.cmi;
-	rm ./*.cmx;
-	rm ./*.o;
-	rm ./dumptoken
+	rm -f ./*.cmi;
+	rm -f ./*.cmx;
+	rm -f ./*.o;
+	rm -f ./dumptoken

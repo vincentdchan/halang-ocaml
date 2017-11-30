@@ -101,6 +101,9 @@ module rec Statement : sig
   | While of While.t
   | Let of Let.t
   | Expression of Expression.t
+  | Break
+  | Continue
+  | Return of Expression.t option
 end = Statement
 
 module rec Program : sig

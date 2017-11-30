@@ -34,7 +34,9 @@ end = struct
             value = content.value;
             raw = content.raw;
           }
-        | _ -> failwith ("unreachable")
+        | _ ->
+          Parser_env.throw_error env "Expect IDENTIFIER";
+          failwith ("unreachable")
       )
 
   let parse_number env : Number.t =
@@ -47,7 +49,9 @@ end = struct
             value = 3;
             raw = "ok";
           }
-        | _ -> failwith ("unreachable")
+        | _ ->
+          Parser_env.throw_error env "Expect NUMBER";
+          failwith ("unreachable")
       )
 
   let parse_string env : StringLiteral.t =
@@ -60,13 +64,17 @@ end = struct
           value = content;
           raw = raw;
         }
-      | _ -> failwith ("unreachable")
+      | _ ->
+        Parser_env.throw_error env "Expect STRING";
+        failwith ("unreachable")
     )
 
   let parse_assign_expr env opId : Expression.Assign.t =
 
     let make_node_with_id id =
       Parser_env.expect env T_ASSIGN;
+
+      let _ = Parser_env.next_token env in
 
       let expr = Parser.parse_expression env in
 
@@ -124,22 +132,23 @@ end = struct
       Expression.(Number (Parser.parse_number env))
     | T_STRING _ ->
       Expression.(StringLiteral (Parser.parse_string env))
-    | _ -> failwith "unreachable"
+    | _ ->
+      Parser_env.throw_error env "Unexpected expression unit";
+      failwith "unreachable"
 
   let parse_expression env : Expression.t =
     let current_tok = Parser_env.peek env in
     Expression.(
       match current_tok with
       | T_NUMBER raw ->
-        let _ = Parser_env.next_token env in
         Number (parse_number env);
       | T_STRING (_, content, raw, _) ->
-        let _ = Parser_env.next_token env in
         StringLiteral (parse_string env);
       | T_IDENTIFIER content ->
-        let _ = Parser_env.next_token env in
         Identifier (parse_identifier env);
-      | _ -> failwith "unreachable"
+      | _ ->
+        Parser_env.throw_error env "Unexpected expression start token";
+        failwith "unreachable"
     )
 
   let parse_call_expr env expr : Expression.Call.t =
@@ -155,7 +164,7 @@ end = struct
           let _ = Parser_env.next_token env in
           parse_params ();
         else if Parser_env.peek env <> T_RPAREN then
-          failwith "unreachable"
+          Parser_env.throw_error env "Expect COMMA or RPAREN"
         else ()
     in
 
@@ -191,7 +200,9 @@ end = struct
           Call (Parser.parse_call_expr env (Identifier id))
       | T_LBRACKET ->
           Member (Parser.parse_member_expr env (Identifier id))
-      | _ -> failwith "unexpected"
+      | _ ->
+        Parser_env.throw_error env "Expect ASSIGN/LPAREN/LBRACKET";
+        failwith "unexpected"
     )
 
   let parse_binary_expr env left_expr left_tok =
