@@ -1,30 +1,41 @@
 open Token
 
 type t = {
-  lex_env : Lex_env.t;
+  lexbuf : Sedlexing.lexbuf;
+  mutable lex_env : Lex_env.t;
   mutable current_tok : Token.t;
 }
 
-let create lex_env = {
-  lex_env;
-  current_tok = T_RPAREN;
-}
+let create lexbuf =
+  let lex_env = {
+    Lex_env.lex_lb                = lexbuf;
+    Lex_env.lex_bol               = Lex_env.init_bol;
+    Lex_env.lex_in_comment_syntax = false;
+    Lex_env.lex_enable_comment_syntax = true;
+    Lex_env.lex_state             = Lex_env.empty_lex_state;
+  } in {
+    lexbuf;
+    lex_env;
+    current_tok = T_RPAREN;
+  }
 
 let peek tt = tt.current_tok
 
-let lexbuf env = env.lex_env.lex_lb
+let lexbuf env = env.lexbuf
 
 let rec next_token t : Token.t =
   let tmp = peek t in
   let () =
     if tmp <> Token.T_EOF then
-      let rec _read_token () =
-        match Lexer.token t.lex_env (lexbuf t) with
-          | Lexer.Token (lex_env, tok) ->
-            t.current_tok <- tok
-          | Lexer.Continue lex_env ->
-            _read_token ()
-      in _read_token ()
+      let rec read_token env lexbuf = (
+        match Lexer.token env lexbuf with
+        | Lexer.Token (env, tok) ->
+          t.lex_env <- env;
+          t.current_tok <- tok;
+        | Lexer.Continue env ->
+          read_token env lexbuf
+        )
+      in read_token t.lex_env t.lexbuf
     else ()
   in
   tmp

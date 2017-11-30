@@ -2,9 +2,7 @@ open Token
 open Lexer
 
 let () =
-  let src = "def name(ok) do print(\"hello\") end"
-  in
-  let lexbuf = Sedlexing.Latin1.from_string src in
+  let lexbuf = Sedlexing.Latin1.from_channel stdin in
   let env = {
     Lex_env.lex_lb                = lexbuf;
     Lex_env.lex_bol               = Lex_env.init_bol;

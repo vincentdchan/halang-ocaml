@@ -22,8 +22,9 @@ ast.cmx: ast.ml
 
 parser_env.cmx: token.cmx lex_env.cmx lexer.cmx  \
 	parser_env.mli parser_env.ml
-	ocamlfind ocamlc -c parser_env.mli;
-	ocamlfind ocamlopt -c token.cmx lex_env.cmx \
+	ocamlfind ocamlc -c -package sedlex parser_env.mli;
+	ocamlfind ocamlopt -c -package sedlex \
+	token.cmx lex_env.cmx \
 	lexer.cmx parser_env.ml
 
 parser_common.cmx : ast.cmx parser_common.ml

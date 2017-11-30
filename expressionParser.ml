@@ -146,6 +146,8 @@ end = struct
         StringLiteral (parse_string env);
       | T_IDENTIFIER content ->
         Identifier (parse_identifier env);
+      | T_PLUS | T_MINUS
+        -> Parser.parse_maybe_unary env;
       | _ ->
         Parser_env.throw_error env "Unexpected expression start token";
         failwith "unreachable"

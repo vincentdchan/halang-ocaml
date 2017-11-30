@@ -28,19 +28,19 @@ module rec RealParser : PARSER = struct
 end
 
 let () =
-  let lexbuf = Sedlexing.Latin1.from_string "let a = 323" in
-  let lex_env = {
-    Lex_env.lex_lb                = lexbuf;
-    Lex_env.lex_bol               = Lex_env.init_bol;
-    Lex_env.lex_in_comment_syntax = false;
-    Lex_env.lex_enable_comment_syntax = true;
-    Lex_env.lex_state             = Lex_env.empty_lex_state;
-  }
+  let lexbuf = Sedlexing.Latin1.from_channel stdin in
+
+  let env = Parser_env.create lexbuf
   in
 
-  let env = Parser_env.create lex_env
+  let program = try
+    Some (RealParser.parse env)
+  with Parser_env.ParsingError content ->
+    Printf.printf "%s\n" content;
+    None
   in
 
-  let program = RealParser.parse env in
-
-  AstDump.dump_program program 0
+  match program with
+  | Some prog ->
+    AstDump.dump_program prog 0
+  | None -> ()
