@@ -132,12 +132,12 @@ let throw_error t (content:string) =
   raise (ParsingError messasge)
 
 let expect t tok =
-  if match_token t tok then ()
-  else
-    let this_tok_name = value_of_token tok in
-    let target_tok_name = value_of_token (peek t) in
+  let current_tok_name = token_to_string (peek t) in
+  let expect_tok_name = token_to_string tok in
+  if current_tok_name <> expect_tok_name then
     let messasge = Printf.sprintf
       "Unexpected: %s expected: %s"
-      this_tok_name target_tok_name
+      current_tok_name expect_tok_name
     in
     throw_error t messasge
+  else ()

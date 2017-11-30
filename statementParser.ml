@@ -71,18 +71,18 @@ end = struct
     in
 
     Parser_env.expect env T_THEN;
-    let _ = Parser_env.next_token env in
+    let _ = next_token () in
 
     let parse_statements () =
       let stmts = ref [] in
 
-      let tok = peek () in
-
       let rec parse_statement' () =
+        let tok = peek () in
         if tok <> T_END && tok <> T_ELSE then
           let stmt = Parser.parse_statement env in
           stmts := stmt::!stmts;
           parse_statement' ()
+        else ()
       in
 
       parse_statement' ();
@@ -92,15 +92,13 @@ end = struct
 
     true_branch := parse_statements ();
 
-    let following_tok = Parser_env.next_token env in
+    let following_tok = next_token () in
 
     Statement.(
       match following_tok with
       | T_END ->
-        let _ = next_token () in
         make_node ()
       | T_ELSE ->
-        let _ = next_token () in
         let fol = peek () in
         (match fol with
           | T_IF ->
@@ -114,7 +112,7 @@ end = struct
             make_node ()
         )
       | _ ->
-        Parser_env.throw_error env "Expected THEN of ELSE";
+        Parser_env.throw_error env "Expected THEN or ELSE";
         failwith "unreachable"
     )
 

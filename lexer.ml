@@ -3,7 +3,7 @@ open Token
 let is_keyword = function
   | "def" | "break" | "case" | "catch" | "const" | "continue"
   | "debugger" | "do" | "else" | "export" | "extends"
-  | "finally" | "for" | "if" | "import" | "in" | "instanceof"
+  | "finally" | "for" | "if" | "then" | "import" | "in" | "instanceof"
   | "new" | "return" | "super" | "throw" | "try"
   | "typeof" | "let" | "end" | "while" | "with" | "yield" -> true
   | _ -> false
@@ -232,6 +232,7 @@ let token (env: Lex_env.t) lexbuf : result =
       | "finally" -> Token (env, T_FINALLY)
       | "for" -> Token (env, T_FOR)
       | "if" -> Token (env, T_IF)
+      | "then" -> Token (env, T_THEN)
       | "import" -> Token (env, T_IMPORT)
       | "in" -> Token (env, T_IN)
       | "instanceof" -> Token (env, T_INSTANCEOF)
