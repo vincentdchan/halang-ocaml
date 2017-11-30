@@ -7,9 +7,10 @@ module StatementParser (Parser : PARSER) : sig
   val parse_ifstatement : Parser_env.t -> Statement.If.t
   val parse_whilestatement : Parser_env.t -> Statement.While.t
   val parse_letstatement : Parser_env.t -> Statement.Let.t
+  val parse_defstatement : Parser_env.t -> Statement.Def.t
 end = struct
 
-  let parse_statement env : Statement.t =
+  let rec parse_statement env : Statement.t =
     let peek () = Parser_env.peek env in
     let current_tok = peek () in
     Statement.(
@@ -23,6 +24,9 @@ end = struct
       | T_LET ->
         let stmt = Parser.parse_letstatement env in
         (Let stmt)
+      | T_DEF ->
+        let stmt = Parser.parse_defstatement env in
+        (Def stmt)
       | T_BREAK ->
         let _ = Parser_env.next_token env in
         Break
@@ -41,6 +45,9 @@ end = struct
           Return (Some expr)
         | _ -> Return None
         )
+      | T_SEMICOLON ->
+        let _ = Parser_env.next_token env in
+        parse_statement env
       | _ ->
         let expr = Parser.parse_expression env in
         (Expression expr)
@@ -176,5 +183,53 @@ end = struct
       let body = parse_assign() in
 
       Statement.Let.(body)
+
+    let parse_defstatement env : Statement.Def.t =
+      let expect = Parser_env.expect env in
+      let peek () = Parser_env.peek env in
+      let next_token () : Token.t =
+        Parser_env.next_token env
+      in
+
+      expect T_DEF;
+      let _ = next_token () in
+
+      let name = Parser.parse_identifier env in
+
+      expect T_LPAREN;
+      let _ = next_token () in
+
+      (* parse params  *)
+      let rec parse_params () =
+        let tok = peek() in
+
+        if tok <> T_RPAREN then
+          let param = Parser.parse_identifier env in
+          param :: parse_params ()
+        else []
+      in
+
+      let params = parse_params () in
+
+      expect T_RPAREN;
+      let _ = next_token () in
+
+      let rec parse_statements () =
+        let tok = peek() in
+
+        if tok <> T_END then
+          let expr = Parser.parse_statement env in
+          expr :: parse_statements ()
+        else []
+      in
+
+      let body = parse_statements () in
+
+      Statement.Def.{
+        name;
+        params;
+        body;
+      }
+
 
 end

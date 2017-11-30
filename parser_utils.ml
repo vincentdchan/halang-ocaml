@@ -18,6 +18,7 @@ module type ASTDUMP = sig
   val dump_if_stat : Statement.If.t -> int -> unit
   val dump_while_stat : Statement.While.t -> int -> unit
   val dump_let_stat : Statement.Let.t -> int -> unit
+  val dump_def_stat : Statement.Def.t -> int -> unit
 
 end
 
@@ -177,9 +178,6 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
       | If _if -> Dump.dump_if_stat _if depth
       | While _while -> Dump.dump_while_stat _while depth
       | Let _let -> Dump.dump_let_stat _let depth
-      | Expression expr ->
-        Printf.printf "%sExpressionStatement\n" (make_spaces depth);
-        dump_expression expr (depth + 1)
       | Break ->
         Printf.printf "%sBreakStatement\n" (make_spaces depth);
       | Continue ->
@@ -192,6 +190,10 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
         | Some expr ->
           Dump.dump_expression expr (depth + 1);
         )
+      | Def _def -> Dump.dump_def_stat _def (depth + 1)
+      | Expression expr ->
+        Printf.printf "%sExpressionStatement\n" (make_spaces depth);
+        dump_expression expr (depth + 1)
     )
 
   let dump_if_stat stat depth =
@@ -229,22 +231,37 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
   let dump_let_stat stat depth =
    Statement.Let.(
       let dump_property depth =
-
-        let rec dump_assigns assigns depth =
-          match assigns with
-          | [] -> ()
-          | assign::rest ->
-            Dump.dump_assign_expr assign depth;
-            dump_assigns rest depth;
-        in
-
         Printf.printf "%sbody:\n" (make_spaces depth);
-        dump_assigns stat (depth + 1)
+        List.iter (fun assign ->
+          Dump.dump_assign_expr assign (depth + 1);
+        ) stat;
       in
 
       Printf.printf "%sLetStatement\n" (make_spaces depth);
       dump_property (depth + 1)
    )
+
+  let dump_def_stat stat depth =
+    Statement.Def.(
+      let dump_property depth =
+        Printf.printf "%sname:\n" (make_spaces depth);
+        Dump.dump_identifier stat.name (depth + 1);
+
+        Printf.printf "%sparams:\n" (make_spaces depth);
+        List.iter (fun param ->
+          Dump.dump_identifier param (depth + 1)
+        ) stat.params;
+
+        Printf.printf "%sbody:\n" (make_spaces depth);
+        List.iter (fun stat ->
+          Dump.dump_statement stat (depth + 1)
+        ) stat.body;
+
+      in
+
+      Printf.printf "%sDefStatement\n" (make_spaces depth);
+      dump_property (depth + 1)
+    )
 
 end
 

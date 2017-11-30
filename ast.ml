@@ -96,10 +96,19 @@ module rec Statement : sig
     type t = Expression.Assign.t list
   end
 
+  module Def : sig
+    type t = {
+      name : Identifier.t;
+      params : Identifier.t list;
+      body : Statement.t list;
+    }
+  end
+
   type t =
   | If of If.t
   | While of While.t
   | Let of Let.t
+  | Def of Def.t
   | Break
   | Continue
   | Return of Expression.t option

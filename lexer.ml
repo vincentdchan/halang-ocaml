@@ -267,6 +267,7 @@ let token (env: Lex_env.t) lexbuf : result =
 
   | '=' -> Token (env, T_ASSIGN)
   | ':' -> Token (env, T_COLON)
+  | ';' -> Token (env, T_SEMICOLON)
   | '|' -> Token (env, T_LG_OR)
   | '&' -> Token (env, T_LG_AND)
   | "==" -> Token (env, T_EQUAL)

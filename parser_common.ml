@@ -9,6 +9,8 @@ module type PARSER = sig
   val parse_ifstatement : Parser_env.t -> Statement.If.t
   val parse_whilestatement : Parser_env.t -> Statement.While.t
   val parse_letstatement : Parser_env.t -> Statement.Let.t
+  val parse_defstatement : Parser_env.t -> Statement.Def.t
+
   val parse_expression : Parser_env.t -> Expression.t
   val parse_maybe_unary : Parser_env.t -> Expression.t
   (* val parse_unary_expr : Parser_env.t -> Expression.Unary.t *)
