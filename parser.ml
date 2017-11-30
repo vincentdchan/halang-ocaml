@@ -11,8 +11,13 @@ module rec RealParser : PARSER = struct
 
   let token_precedence = function
   | T_PLUS | T_MINUS -> 10
-  | T_MULT | T_DIV -> 20
+  | T_LSHIFT | T_RSHIFT -> 15
+  | T_MULT | T_DIV | T_MOD -> 20
   | T_EXP -> 30
+  | T_EQUAL
+  | T_NOT_EQUAL
+  | T_LT | T_LTEQ
+  | T_GT | T_GTEQ -> 5
   | _ -> 0
 
   let parse env : Program.t =

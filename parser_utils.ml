@@ -35,6 +35,26 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
     ) stats;
   ;;
 
+  let op_to_string = Expression.(function
+  | O_LG_OR -> "LG_OR"
+  | O_LG_AND -> "LG_AND"
+  | O_EQUAL -> "EQUAL"
+  | O_NOT_EQUAL -> "NOT_EQUAL"
+  | O_LTEQ -> "LTEQ"
+  | O_GTEQ -> "GTEQ"
+  | O_LT -> "LT"
+  | O_GT -> "GT"
+  | O_LSHIFT -> "LSHIFT"
+  | O_RSHIFT -> "RSHIGT"
+  | O_PLUS -> "PLUS"
+  | O_MINUS -> "MINUS"
+  | O_MULT -> "MULT"
+  | O_DIV -> "DIV"
+  | O_EXP -> "EXP"
+  | O_MOD -> "MOD"
+  )
+
+
   let dump_program prog depth =
     Program.(
       Printf.printf "%sProgram\n" (make_spaces depth);
@@ -99,12 +119,7 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
     Expression.Unary.(
       let dump_property depth =
         Printf.printf "%sop: %s\n" (make_spaces depth) Expression.(
-          match expr.op with
-          | Plus -> "Plus"
-          | Minus -> "Minus"
-          | Mult -> "Mult"
-          | Div -> "Div"
-          | Exp -> "Exp"
+          op_to_string expr.op
         );
         Printf.printf "%sbody:\n" (make_spaces depth);
         Dump.dump_expression expr.body (depth + 1);
@@ -117,12 +132,7 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
     Expression.Binary.(
       let dump_property depth =
         Printf.printf "%sop: %s\n" (make_spaces depth) Expression.(
-          match expr.op with
-          | Plus -> "Plus"
-          | Minus -> "Minus"
-          | Mult -> "Mult"
-          | Div -> "Div"
-          | Exp -> "Exp"
+          op_to_string expr.op
         );
         Printf.printf "%sleft:\n" (make_spaces depth);
         Dump.dump_expression expr.left (depth + 1);

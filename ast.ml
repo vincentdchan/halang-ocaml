@@ -23,11 +23,11 @@ end = Number
 module rec Expression : sig
 
   type op_type =
-  | Plus
-  | Minus
-  | Mult
-  | Div
-  | Exp
+  | O_LG_OR | O_LG_AND | O_EQUAL | O_NOT_EQUAL
+  | O_LTEQ | O_GTEQ | O_LT | O_GT
+  | O_LSHIFT | O_RSHIFT
+  | O_PLUS | O_MINUS | O_MULT | O_DIV | O_EXP
+  | O_MOD
 
   module Assign : sig
     type t = {

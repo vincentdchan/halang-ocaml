@@ -22,5 +22,5 @@ module type PARSER = sig
   val parse_member_expr : Parser_env.t -> Expression.t -> Expression.Member.t
   val parse_call_assign_member_expr : Parser_env.t -> Expression.t
 
-  val parse_binary_expr : Parser_env.t -> Expression.t -> Token.t -> Expression.Binary.t
+  val parse_binary_expr : Parser_env.t -> Expression.t -> Token.t -> Expression.t
 end

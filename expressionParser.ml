@@ -15,7 +15,7 @@ module ExpressionParser (Parser : PARSER) : sig
   val parse_member_expr : Parser_env.t -> Expression.t -> Expression.Member.t
   val parse_call_assign_member_expr : Parser_env.t -> Expression.t
 
-  val parse_binary_expr : Parser_env.t -> Expression.t -> Token.t -> Expression.Binary.t
+  val parse_binary_expr : Parser_env.t -> Expression.t -> Token.t -> Expression.t
 end = struct
 
   let id_tok = T_IDENTIFIER {
@@ -95,24 +95,25 @@ end = struct
   let parse_maybe_unary env : Expression.t =
     let current_tok = Parser_env.peek env in
 
-    let go_with_op op : Expression.t =
+    if (Parser.token_precedence current_tok) > 0 then
       let _ = Parser_env.next_token env in
-      let expr = Parser.parse_expression_unit env in
+
+      let op = Expression.(match current_tok with
+        | T_PLUS -> O_PLUS
+        | T_MINUS -> O_MINUS
+        | _ ->
+          Parser_env.throw_error env "Expect PLUS or MINUS";
+          failwith "unreachable"
+      )
+      in
+
       Expression.(Unary {Unary.
         op;
-        body = expr;
+        body = Parser.parse_expression_unit env;
       })
-    in
 
-    Expression.(
-      match current_tok with
-      | T_PLUS -> (go_with_op Plus)
-      | T_MINUS -> (go_with_op Minus)
-      | T_MULT -> (go_with_op Mult)
-      | T_DIV -> (go_with_op Div)
-      | T_EXP -> (go_with_op Exp)
-      | _ -> Parser.parse_expression_unit env
-    )
+    else
+      Parser.parse_expression_unit env
 
   let parse_expression_unit env : Expression.t =
     let current_tok = Parser_env.peek env in
@@ -137,21 +138,16 @@ end = struct
       failwith "unreachable"
 
   let parse_expression env : Expression.t =
-    let current_tok = Parser_env.peek env in
-    Expression.(
-      match current_tok with
-      | T_NUMBER raw ->
-        Number (parse_number env);
-      | T_STRING (_, content, raw, _) ->
-        StringLiteral (parse_string env);
-      | T_IDENTIFIER content ->
-        Identifier (parse_identifier env);
-      | T_PLUS | T_MINUS
-        -> Parser.parse_maybe_unary env;
-      | _ ->
-        Parser_env.throw_error env "Unexpected expression start token";
-        failwith "unreachable"
-    )
+    let left = parse_maybe_unary env in
+
+    let tok = Parser_env.peek env in
+
+    if (Parser.token_precedence tok) > 0 then
+      let next_tok = Parser_env.next_token env in
+
+      Parser.parse_binary_expr env left next_tok
+    else
+      left
 
   let parse_call_expr env expr : Expression.Call.t =
     let params = ref [] in
@@ -203,16 +199,70 @@ end = struct
       | T_LBRACKET ->
           Member (Parser.parse_member_expr env (Identifier id))
       | _ ->
-        Parser_env.throw_error env "Expect ASSIGN/LPAREN/LBRACKET";
-        failwith "unexpected"
+        Identifier id
     )
 
-  let parse_binary_expr env left_expr left_tok =
-    let right_expr = parse_maybe_unary env in
-    Expression. {Binary.
-      op = Plus;
-      left = left_expr;
-      right = right_expr;
-    }
+  let rec parse_binary_expr env left_expr left_tok: Expression.t =
+    let expr = (parse_maybe_unary env) in
+
+    let token_to_op = Expression.(function
+      | T_LG_OR -> O_LG_OR
+      | T_LG_AND -> O_LG_AND
+      | T_EQUAL -> O_EQUAL
+      | T_NOT_EQUAL -> O_NOT_EQUAL
+      | T_LTEQ -> O_LTEQ
+      | T_GTEQ -> O_GTEQ
+      | T_LT -> O_LT
+      | T_GT -> O_GT
+      | T_LSHIFT -> O_LSHIFT
+      | T_RSHIFT -> O_RSHIFT
+      | T_PLUS -> O_PLUS
+      | T_MINUS -> O_MINUS
+      | T_MULT -> O_MULT
+      | T_DIV -> O_DIV
+      | T_EXP -> O_EXP
+      | T_MOD -> O_MOD
+      | _ -> failwith "unknown operator"
+    )
+    in
+
+    let rec loop exp : Expression.t =
+
+      let right_tok = Parser_env.peek env in
+
+      let left_precedence = Parser.token_precedence left_tok in
+      let right_precedence = Parser.token_precedence right_tok in
+
+      if left_precedence < right_precedence then
+
+        let _ = Parser_env.next_token env in
+        let exp = Parser.parse_binary_expr env expr right_tok
+        in
+        loop exp
+      else if left_precedence = right_precedence then
+      (
+        if left_precedence = 0 then
+          exp
+        else
+          let exp = Expression.(Binary {Binary.
+            op = token_to_op left_tok;
+            left = left_expr;
+            right = expr;
+          })
+          in
+          let _ = Parser_env.next_token env in
+          parse_binary_expr env exp right_tok
+      )
+      else
+        Expression.(Binary {Binary.
+          op = token_to_op left_tok;
+          left = left_expr;
+          right = exp;
+        })
+
+    in
+
+    loop expr
+
 
 end
