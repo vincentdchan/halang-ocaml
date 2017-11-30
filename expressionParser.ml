@@ -95,7 +95,7 @@ end = struct
   let parse_maybe_unary env : Expression.t =
     let current_tok = Parser_env.peek env in
 
-    if (Parser.token_precedence current_tok) > 0 then
+    if current_tok = T_PLUS || current_tok = T_MINUS then
       let _ = Parser_env.next_token env in
 
       let op = Expression.(match current_tok with

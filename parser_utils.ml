@@ -204,6 +204,8 @@ module AstDumpFunctor(Dump : ASTDUMP) = struct
       | Expression expr ->
         Printf.printf "%sExpressionStatement\n" (make_spaces depth);
         dump_expression expr (depth + 1)
+      | Null ->
+        Printf.printf "%sNullStatement\n" (make_spaces depth);
     )
 
   let dump_if_stat stat depth =

@@ -47,7 +47,7 @@ end = struct
         )
       | T_SEMICOLON ->
         let _ = Parser_env.next_token env in
-        parse_statement env
+        Statement.Null
       | _ ->
         let expr = Parser.parse_expression env in
         (Expression expr)
@@ -80,21 +80,12 @@ end = struct
     Parser_env.expect env T_THEN;
     let _ = next_token () in
 
-    let parse_statements () =
-      let stmts = ref [] in
-
-      let rec parse_statement' () =
-        let tok = peek () in
-        if tok <> T_END && tok <> T_ELSE then
-          let stmt = Parser.parse_statement env in
-          stmts := stmt::!stmts;
-          parse_statement' ()
-        else ()
-      in
-
-      parse_statement' ();
-
-      List.rev !stmts
+    let rec parse_statements () =
+      let tok = peek () in
+      if tok <> T_END && tok <> T_ELSE then
+        let stmt = Parser.parse_statement env in
+        stmt::(parse_statements ())
+      else []
     in
 
     true_branch := parse_statements ();

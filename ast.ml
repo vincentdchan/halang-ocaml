@@ -113,6 +113,7 @@ module rec Statement : sig
   | Continue
   | Return of Expression.t option
   | Expression of Expression.t
+  | Null
 end = Statement
 
 module rec Program : sig
