@@ -1,6 +1,8 @@
 open Ast
 
 module type PARSER = sig
+  val token_precedence : Token.t -> int
+
   val parse : Parser_env.t -> Program.t
   val parse_identifier : Parser_env.t -> Identifier.t
   val parse_string : Parser_env.t -> StringLiteral.t

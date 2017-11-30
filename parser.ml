@@ -9,6 +9,12 @@ module rec RealParser : PARSER = struct
   include StatementParser(RealParser)
   include ExpressionParser(RealParser)
 
+  let token_precedence = function
+  | T_PLUS | T_MINUS -> 10
+  | T_MULT | T_DIV -> 20
+  | T_EXP -> 30
+  | _ -> 0
+
   let parse env : Program.t =
     let _ = Parser_env.next_token env in
 
