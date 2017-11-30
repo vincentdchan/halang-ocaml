@@ -100,10 +100,10 @@ module rec Statement : sig
   | If of If.t
   | While of While.t
   | Let of Let.t
-  | Expression of Expression.t
   | Break
   | Continue
   | Return of Expression.t option
+  | Expression of Expression.t
 end = Statement
 
 module rec Program : sig

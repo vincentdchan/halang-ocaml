@@ -23,6 +23,24 @@ end = struct
       | T_LET ->
         let stmt = Parser.parse_letstatement env in
         (Let stmt)
+      | T_BREAK ->
+        let _ = Parser_env.next_token env in
+        Break
+      | T_CONTINUE ->
+        let _ = Parser_env.next_token env in
+        Continue
+      | T_RETURN ->
+        let next = Parser_env.next_token env in (
+        match next with
+        | T_NUMBER _
+        | T_STRING _
+        | T_IDENTIFIER _
+        | T_PLUS | T_MINUS
+        | T_LPAREN ->
+          let expr = Parser.parse_expression env in
+          Return (Some expr)
+        | _ -> Return None
+        )
       | _ ->
         let expr = Parser.parse_expression env in
         (Expression expr)
