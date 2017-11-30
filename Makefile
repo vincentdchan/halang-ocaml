@@ -64,3 +64,4 @@ clean:
 	rm -f ./*.cmx;
 	rm -f ./*.o;
 	rm -f ./dumptoken
+	rm -f ./parser
